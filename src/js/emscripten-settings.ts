@@ -161,16 +161,6 @@ function getFileSystemInitializationFuncs(config: ConfigType): PreRunFunc[] {
 function getInstantiateWasmFunc(
   indexURL: string,
 ): EmscriptenSettings["instantiateWasm"] {
-  if (SOURCEMAP) {
-    // According to the docs:
-    //
-    // "Sanitizers or source map is currently not supported if overriding
-    // WebAssembly instantiation with Module.instantiateWasm."
-    // https://emscripten.org/docs/api_reference/module.html?highlight=instantiatewasm#Module.instantiateWasm
-    //
-    // I haven't checked if this is actually a problem in practice.
-    return;
-  }
   const { binary, response } = getBinaryResponse(indexURL + "pyodide.asm.wasm");
   return function (
     imports: { [key: string]: any },
