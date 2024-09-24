@@ -7,7 +7,6 @@ describe("Module", () => {
       return;
       const settings = pyodideModule.createSettings({
         indexURL: "a",
-        _node_mounts: [],
         args: [],
         env: {},
         lockFileURL: "a",

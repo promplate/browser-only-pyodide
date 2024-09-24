@@ -1,6 +1,5 @@
 import {
   IN_BROWSER_MAIN_THREAD,
-  IN_NODE,
   IN_BROWSER_WEB_WORKER,
   IN_SAFARI,
 } from "./environments";
@@ -60,10 +59,7 @@ installPostMessageHandler();
  *   - Ref: https://github.com/YuzuJS/setImmediate/issues/80
  */
 function scheduleCallbackImmediate(callback: () => void) {
-  if (IN_NODE) {
-    // node has setImmediate, let's use it
-    setImmediate(callback);
-  } else if (
+  if (
     IN_BROWSER_MAIN_THREAD &&
     typeof globalThis.postMessage === "function"
   ) {

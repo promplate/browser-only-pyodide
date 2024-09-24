@@ -1,7 +1,6 @@
 /** @private */
 
 import { ConfigType } from "./pyodide";
-import { initializeNativeFS } from "./nativefs";
 import { loadBinaryFile, getBinaryResponse } from "./compat";
 import { API, PreRunFunc } from "./types";
 
@@ -101,19 +100,6 @@ function setEnvironment(env: { [key: string]: string }): PreRunFunc {
 }
 
 /**
- * Mount local directories to the virtual file system. Only for Node.js.
- * @param mounts The list of paths to mount.
- */
-function mountLocalDirectories(mounts: string[]): PreRunFunc {
-  return (Module) => {
-    for (const mount of mounts) {
-      Module.FS.mkdirTree(mount);
-      Module.FS.mount(Module.FS.filesystems.NODEFS, { root: mount }, mount);
-    }
-  };
-}
-
-/**
  * Install the Python standard library to the virtual file system.
  *
  * Previously, this was handled by Emscripten's file packager (pyodide.asm.data).
@@ -169,8 +155,6 @@ function getFileSystemInitializationFuncs(config: ConfigType): PreRunFunc[] {
     installStdlib(stdLibURL),
     createHomeDirectory(config.env.HOME),
     setEnvironment(config.env),
-    mountLocalDirectories(config._node_mounts),
-    initializeNativeFS,
   ];
 }
 

@@ -3,12 +3,12 @@ import { CanvasInterface, canvas } from "./canvas";
 
 import { PackageData, loadPackage, loadedPackages } from "./load-package";
 import { type PyProxy, type PyDict } from "generated/pyproxy";
-import { loadBinaryFile, nodeFSMod } from "./compat";
+import { loadBinaryFile } from "./compat";
 import { version } from "./version";
 import { setStdin, setStdout, setStderr } from "./streams";
 import { scheduleCallback } from "./scheduler";
 import { TypedArray } from "./types";
-import { IN_NODE, detectEnvironment } from "./environments";
+import { detectEnvironment } from "./environments";
 import "./literal-map.js";
 import {
   makeGlobalsProxy,
@@ -195,8 +195,8 @@ export class PyodideAPI {
       errorCallback?: (message: string) => void;
       checkIntegrity?: boolean;
     } = {
-      checkIntegrity: true,
-    },
+        checkIntegrity: true,
+      },
   ): Promise<Array<PackageData>> {
     let pyimports = API.pyodide_code.find_imports(code);
     let imports;
@@ -550,36 +550,6 @@ export class PyodideAPI {
       syncfs: async () =>
         new Promise((resolve, _) => Module.FS.syncfs(false, resolve)),
     };
-  }
-
-  /**
-   * Mounts a host directory into Pyodide file system. Only works in node.
-   *
-   * @param emscriptenPath The absolute path in the Emscripten file system to
-   * mount the native directory. If the directory does not exist, it will be
-   * created. If it does exist, it must be empty.
-   * @param hostPath The host path to mount. It must be a directory that exists.
-   */
-  static mountNodeFS(emscriptenPath: string, hostPath: string): void {
-    if (!IN_NODE) {
-      throw new Error("mountNodeFS only works in Node");
-    }
-    ensureMountPathExists(emscriptenPath);
-    let stat;
-    try {
-      stat = nodeFSMod.lstatSync(hostPath);
-    } catch (e) {
-      throw new Error(`hostPath '${hostPath}' does not exist`);
-    }
-    if (!stat.isDirectory()) {
-      throw new Error(`hostPath '${hostPath}' is not a directory`);
-    }
-
-    Module.FS.mount(
-      Module.FS.filesystems.NODEFS,
-      { root: hostPath },
-      emscriptenPath,
-    );
   }
 
   /**
