@@ -1,4 +1,4 @@
-export {};
+export { };
 import type { PyProxy, PyAwaitable } from "generated/pyproxy";
 import { type PyodideInterface } from "./api";
 import { type ConfigType } from "./pyodide";
@@ -91,10 +91,10 @@ declare global {
     default_converter:
       | null
       | ((
-          obj: PyProxy,
-          convert: (obj: PyProxy) => any,
-          cacheConversion: (obj: PyProxy, result: any) => void,
-        ) => any),
+        obj: PyProxy,
+        convert: (obj: PyProxy) => any,
+        cacheConversion: (obj: PyProxy, result: any) => void,
+      ) => any),
   ) => any;
 
   export const _pyproxy_getflags: (
@@ -249,7 +249,7 @@ export interface FS {
     position?: number,
   ) => number;
   close: (stream: FSStream) => void;
-  ErrnoError: { new (errno: number): Error };
+  ErrnoError: { new(errno: number): Error };
   registerDevice<T>(dev: number, ops: FSStreamOpsGen<T>): void;
   syncfs(dir: boolean, oncomplete: (val: void) => void): void;
   findObject(a: string, dontResolveLastLink?: boolean): any;
@@ -397,7 +397,6 @@ export interface API {
   config: ConfigType;
   packageIndexReady: Promise<void>;
   bootstrapFinalizedPromise: Promise<void>;
-  setCdnUrl: (url: string) => void;
   typedArrayAsUint8Array: (buffer: TypedArray | ArrayBuffer) => Uint8Array;
   initializeStreams: (
     stdin?: InFuncType | undefined,

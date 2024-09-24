@@ -4,7 +4,6 @@
 import {
   calculateDirname,
   loadScript,
-  initNodeModules,
   resolvePath,
   loadLockFile,
 } from "./compat";
@@ -47,7 +46,6 @@ export type ConfigType = {
   stderr?: (msg: string) => void;
   jsglobals?: object;
   args: string[];
-  _node_mounts: string[];
   env: { [key: string]: string };
   packages: string[];
   _makeSnapshot: boolean;
@@ -182,27 +180,17 @@ export async function loadPyodide(
      * match the version of the Pyodide js package.
      */
     checkAPIVersion?: boolean;
-    /**
-     * Used by the cli runner. If we want to detect a virtual environment from
-     * the host file system, it needs to be visible from when `main()` is
-     * called. The directories in this list will be mounted at the same address
-     * into the Emscripten file system so that virtual environments work in the
-     * cli runner.
-     * @ignore
-     */
-    _node_mounts?: string[];
     /** @ignore */
     _makeSnapshot?: boolean;
     /** @ignore */
     _loadSnapshot?:
-      | Uint8Array
-      | ArrayBuffer
-      | PromiseLike<Uint8Array | ArrayBuffer>;
+    | Uint8Array
+    | ArrayBuffer
+    | PromiseLike<Uint8Array | ArrayBuffer>;
     /** @ignore */
     _snapshotDeserializer?: (obj: any) => any;
   } = {},
 ): Promise<PyodideInterface> {
-  await initNodeModules();
   let indexURL = options.indexURL || (await calculateDirname());
   indexURL = resolvePath(indexURL); // A relative indexURL causes havoc.
   if (!indexURL.endsWith("/")) {
@@ -216,7 +204,6 @@ export async function loadPyodide(
     stdin: globalThis.prompt ? globalThis.prompt : undefined,
     lockFileURL: indexURL + "pyodide-lock.json",
     args: [],
-    _node_mounts: [],
     env: {},
     packageCacheDir: indexURL,
     packages: [],
@@ -293,11 +280,6 @@ If you updated the Pyodide version, make sure you also updated the 'indexURL' pa
   );
   API.sys.path.insert(0, API.config.env.HOME);
 
-  if (!pyodide.version.includes("dev")) {
-    // Currently only used in Node to download packages the first time they are
-    // loaded. But in other cases it's harmless.
-    API.setCdnUrl(`https://cdn.jsdelivr.net/pyodide/v${pyodide.version}/full/`);
-  }
   API._pyodide.set_excepthook();
   await API.packageIndexReady;
   // I think we want this initializeStreams call to happen after

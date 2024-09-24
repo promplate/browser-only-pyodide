@@ -5,7 +5,6 @@ import {
   InternalPackageData,
   PackageLoadMetadata,
 } from "./types";
-import { IN_NODE } from "./environments";
 import { PyProxy } from "generated/pyproxy";
 import { createResolvable } from "./common/resolveable";
 import { createLock } from "./common/lock";
@@ -15,10 +14,8 @@ import {
   base16ToBase64,
 } from "./packaging-utils";
 import {
-  nodeFsPromisesMod,
   loadBinaryFile,
   resolvePath,
-  initNodeModules,
 } from "./compat";
 import { loadDynlibsFromPackage } from "./dynload";
 
@@ -32,7 +29,6 @@ import { loadDynlibsFromPackage } from "./dynload";
 export async function initializePackageIndex(
   lockFilePromise: Promise<Lockfile>,
 ) {
-  await initNodeModules();
   const lockfile = await lockFilePromise;
   if (!lockfile.packages) {
     throw new Error(
@@ -43,8 +39,8 @@ export async function initializePackageIndex(
   if (lockfile.info.version !== API.version) {
     throw new Error(
       "Lock file version doesn't match Pyodide version.\n" +
-        `   lockfile version: ${API.lockfile_info.version}\n` +
-        `   pyodide  version: ${API.version}`,
+      `   lockfile version: ${API.lockfile_info.version}\n` +
+      `   pyodide  version: ${API.version}`,
     );
   }
 
@@ -78,7 +74,7 @@ export async function initializePackageIndex(
   if (API.config.fullStdLib) {
     toLoad = [...toLoad, ...API.lockfile_unvendored_stdlibs];
   }
-  await loadPackage(toLoad, { messageCallback() {} });
+  await loadPackage(toLoad, { messageCallback() { } });
   // Have to wait for bootstrapFinalizedPromise before calling Python APIs
   await API.bootstrapFinalizedPromise;
   // Set up module_not_found_hook
@@ -98,13 +94,6 @@ const DEFAULT_CHANNEL = "default channel";
  */
 class PackageManager {
   // TODO: Add API and Module as properties
-
-  /**
-   * Only used in Node. If we can't find a package in node_modules, we'll use this
-   * to fetch the package from the cdn (and we'll store it into node_modules so
-   * subsequent loads don't require a web request).
-   */
-  private cdnURL: string = "";
 
   /**
    * The set of loaded packages.
@@ -159,8 +148,8 @@ class PackageManager {
       errorCallback?: (message: string) => void;
       checkIntegrity?: boolean;
     } = {
-      checkIntegrity: true,
-    },
+        checkIntegrity: true,
+      },
   ): Promise<Array<PackageData>> {
     const loadedPackageData = new Set<InternalPackageData>();
     const messageCallback = options.messageCallback || console.log;
@@ -188,8 +177,8 @@ class PackageManager {
       } else {
         errorCallback(
           `URI mismatch, attempting to load package ${name} from ${channel} ` +
-            `while it is already loaded from ${loaded}. To override a dependency, ` +
-            `load the custom package first.`,
+          `while it is already loaded from ${loaded}. To override a dependency, ` +
+          `load the custom package first.`,
         );
       }
     }
@@ -322,8 +311,7 @@ class PackageManager {
 
       if (toLoad.has(pkgname) && toLoad.get(pkgname)!.channel !== channel) {
         errorCallback(
-          `Loading same package ${pkgname} from ${channel} and ${
-            toLoad.get(pkgname)!.channel
+          `Loading same package ${pkgname} from ${channel} and ${toLoad.get(pkgname)!.channel
           }`,
         );
         continue;
@@ -367,21 +355,7 @@ class PackageManager {
     checkIntegrity: boolean = true,
   ): Promise<Uint8Array> {
     let installBaseUrl: string;
-    if (IN_NODE) {
-      installBaseUrl = API.config.packageCacheDir;
-      // Ensure that the directory exists before trying to download files into it.
-      try {
-        // Check if the `installBaseUrl` directory exists
-        await nodeFsPromisesMod.stat(installBaseUrl); // Use `.stat()` which works even on ASAR archives of Electron apps, while `.access` doesn't.
-      } catch {
-        // If it doesn't exist, make it. Call mkdir() here only when necessary after checking the existence to avoid an error on read-only file systems. See https://github.com/pyodide/pyodide/issues/4736
-        await nodeFsPromisesMod.mkdir(installBaseUrl, {
-          recursive: true,
-        });
-      }
-    } else {
-      installBaseUrl = API.config.indexURL;
-    }
+    installBaseUrl = API.config.indexURL;
 
     let fileName, uri, fileSubResourceHash;
     if (pkg.channel === DEFAULT_CHANNEL) {
@@ -401,24 +375,7 @@ class PackageManager {
     if (!checkIntegrity) {
       fileSubResourceHash = undefined;
     }
-    try {
-      return await loadBinaryFile(uri, fileSubResourceHash);
-    } catch (e) {
-      if (!IN_NODE || pkg.channel !== DEFAULT_CHANNEL) {
-        throw e;
-      }
-    }
-    console.log(
-      `Didn't find package ${fileName} locally, attempting to load from ${this.cdnURL}`,
-    );
-    // If we are IN_NODE, download the package from the cdn, then stash it into
-    // the node_modules directory for future use.
-    let binary = await loadBinaryFile(this.cdnURL + fileName);
-    console.log(
-      `Package ${fileName} loaded from ${this.cdnURL}, caching the wheel in node_modules for future use.`,
-    );
-    await nodeFsPromisesMod.writeFile(uri, binary);
-    return binary;
+    return await loadBinaryFile(uri, fileSubResourceHash);
   }
 
   /**
@@ -516,9 +473,6 @@ class PackageManager {
     }
   }
 
-  public setCdnUrl(url: string) {
-    this.cdnURL = url;
-  }
 }
 
 function filterPackageData({
@@ -548,7 +502,6 @@ export const loadedPackages = singletonPackageManager.loadedPackages;
 API.recursiveDependencies = singletonPackageManager.recursiveDependencies.bind(
   singletonPackageManager,
 );
-API.setCdnUrl = singletonPackageManager.setCdnUrl.bind(singletonPackageManager);
 
 if (API.lockFilePromise) {
   API.packageIndexReady = initializePackageIndex(API.lockFilePromise);

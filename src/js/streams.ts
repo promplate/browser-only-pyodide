@@ -1,20 +1,7 @@
-import { IN_NODE } from "./environments.js";
 import "./constants";
 
 import type { FSStream, FSStreamOpsGen } from "./types";
-const fs: any = IN_NODE ? require("node:fs") : undefined;
-const tty: any = IN_NODE ? require("node:tty") : undefined;
 
-function nodeFsync(fd: number): void {
-  try {
-    fs.fsyncSync(fd);
-  } catch (e: any) {
-    if (e && e.code === "EINVAL") {
-      return;
-    }
-    throw e;
-  }
-}
 
 type Reader = {
   isatty?: boolean;
@@ -258,11 +245,7 @@ API.initializeStreams = function (
  * If in a browser, this calls setStdinError.
  */
 function setDefaultStdin() {
-  if (IN_NODE) {
-    setStdin(new NodeReader(process.stdin.fd));
-  } else {
-    setStdin({ stdin: () => prompt() });
-  }
+  setStdin({ stdin: () => prompt() });
 }
 
 /**
@@ -420,11 +403,7 @@ function _setStdwrite(
  * If in a browser, sets stdout to write to console.log and sets isatty(stdout) to false.
  */
 function _getStdoutDefaults(): StdwriteOpts & Partial<Writer> {
-  if (IN_NODE) {
-    return new NodeWriter(process.stdout.fd);
-  } else {
-    return { batched: (x) => console.log(x) };
-  }
+  return { batched: (x) => console.log(x) };
 }
 
 /**
@@ -433,11 +412,7 @@ function _getStdoutDefaults(): StdwriteOpts & Partial<Writer> {
  * If in a browser, sets stdout to write to console.log and sets isatty(stdout) to false.
  */
 function _getStderrDefaults(): StdwriteOpts & Partial<Writer> {
-  if (IN_NODE) {
-    return new NodeWriter(process.stderr.fd);
-  } else {
-    return { batched: (x) => console.warn(x) };
-  }
+  return { batched: (x) => console.warn(x) };
 }
 
 /**
@@ -511,34 +486,6 @@ class ErrorReader {
   read(buffer: Uint8Array): number {
     // always set an IO error.
     throw new FS.ErrnoError(cDefs.EIO);
-  }
-}
-
-class NodeReader {
-  fd: number;
-  isatty: boolean;
-
-  constructor(fd: number) {
-    this.fd = fd;
-    this.isatty = tty.isatty(fd);
-  }
-
-  read(buffer: Uint8Array): number {
-    try {
-      return fs.readSync(this.fd, buffer);
-    } catch (e) {
-      // Platform differences: on Windows, reading EOF throws an exception,
-      // but on other OSes, reading EOF returns 0. Uniformize behavior by
-      // catching the EOF exception and returning 0.
-      if ((e as Error).toString().includes("EOF")) {
-        return 0;
-      }
-      throw e;
-    }
-  }
-
-  fsync() {
-    nodeFsync(this.fd);
   }
 }
 
@@ -639,7 +586,7 @@ class LegacyReader {
     }
   }
 
-  fsync() {}
+  fsync() { }
 }
 
 // Writer implementations
@@ -689,22 +636,5 @@ class StringWriter {
       this.out(textdecoder.decode(new Uint8Array(this.output)));
       this.output = [];
     }
-  }
-}
-
-class NodeWriter {
-  fd: number;
-  isatty: boolean;
-  constructor(fd: number) {
-    this.fd = fd;
-    this.isatty = tty.isatty(fd);
-  }
-
-  write(buffer: Uint8Array): number {
-    return fs.writeSync(this.fd, buffer);
-  }
-
-  fsync() {
-    nodeFsync(this.fd);
   }
 }
