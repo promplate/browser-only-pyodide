@@ -3,7 +3,7 @@ import {
   IN_BROWSER_MAIN_THREAD,
   IN_BROWSER_WEB_WORKER,
 } from "./environments";
-import { Lockfile } from "./types";
+import type { Lockfile } from "./types";
 
 declare var globalThis: {
   importScripts: (url: string) => void;

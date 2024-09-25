@@ -1,5 +1,5 @@
 export { };
-import type { PyProxy, PyAwaitable } from "generated/pyproxy";
+import type { PyProxy, PyAwaitable } from "./generated/pyproxy";
 import { type PyodideInterface } from "./api";
 import { type ConfigType } from "./pyodide";
 import { type InFuncType } from "./streams";
@@ -8,7 +8,7 @@ import {
   type InternalPackageData,
   type PackageLoadMetadata,
 } from "./load-package";
-import { SnapshotConfig } from "./snapshot";
+import type { SnapshotConfig } from "./snapshot";
 
 export type TypedArray =
   | Int8Array

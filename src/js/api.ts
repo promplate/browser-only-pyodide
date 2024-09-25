@@ -1,18 +1,18 @@
 import { ffi } from "./ffi";
-import { CanvasInterface, canvas } from "./canvas";
+import { type CanvasInterface, canvas } from "./canvas";
 
-import { PackageData, loadPackage, loadedPackages } from "./load-package";
-import { type PyProxy, type PyDict } from "generated/pyproxy";
+import { type PackageData, loadPackage, loadedPackages } from "./load-package";
+import { type PyProxy, type PyDict } from "./generated/pyproxy";
 import { loadBinaryFile } from "./compat";
 import { version } from "./version";
 import { setStdin, setStdout, setStderr } from "./streams";
 import { scheduleCallback } from "./scheduler";
-import { TypedArray } from "./types";
+import type { TypedArray } from "./types";
 import { detectEnvironment } from "./environments";
 import "./literal-map.js";
 import {
   makeGlobalsProxy,
-  SnapshotConfig,
+  type SnapshotConfig,
   syncUpSnapshotLoad1,
   syncUpSnapshotLoad2,
 } from "./snapshot";

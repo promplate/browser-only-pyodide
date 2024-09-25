@@ -17,8 +17,8 @@ export type {
   PyBufferView,
   PySequence,
   PyMutableSequence,
-} from "generated/pyproxy";
-export type { PythonError } from "generated/error_handling";
+} from "./generated/pyproxy";
+export type { PythonError } from "./generated/error_handling";
 // These need to be imported for their side effects at startup
 import "generated/js2python";
 import "generated/python2js_buffer";
@@ -44,9 +44,9 @@ import {
   PyBufferView,
   PySequence,
   PyMutableSequence,
-} from "generated/pyproxy";
+} from "./generated/pyproxy";
 
-import { PythonError } from "../core/error_handling";
+import { PythonError } from "./generated/error_handling";
 
 /**
  * See :ref:`js-api-pyodide-ffi`

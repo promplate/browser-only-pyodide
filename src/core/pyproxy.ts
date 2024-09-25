@@ -18,7 +18,7 @@ declare var Tests: any;
 declare var Module: any;
 declare var validSuspender: { value: boolean };
 
-import { TypedArray } from "types";
+import type { TypedArray } from "types";
 import { warnOnce } from "pyodide-util";
 
 // pyodide-skip
@@ -102,7 +102,7 @@ if (globalThis.FinalizationRegistry) {
   //   }
   // });
 } else {
-  Module.finalizationRegistry = { register() {}, unregister() {} };
+  Module.finalizationRegistry = { register() { }, unregister() { } };
   // Module.bufferFinalizationRegistry = finalizationRegistry;
 }
 
@@ -120,8 +120,8 @@ Module.enable_pyproxy_allocation_tracing = function () {
   };
 };
 Module.disable_pyproxy_allocation_tracing = function () {
-  trace_pyproxy_alloc = function (proxy: any) {};
-  trace_pyproxy_dealloc = function (proxy: any) {};
+  trace_pyproxy_alloc = function (proxy: any) { };
+  trace_pyproxy_dealloc = function (proxy: any) { };
 };
 Module.disable_pyproxy_allocation_tracing();
 
@@ -237,7 +237,7 @@ function pyproxy_new(
     // `setPrototypeOf`. The documentation for `setPrototypeOf` says to use
     // `Object.create` or `Reflect.construct` instead for performance reasons
     // but neither of those work here.
-    target = function () {};
+    target = function () { };
     Object.setPrototypeOf(target, cls.prototype);
     // Remove undesirable properties added by Function constructor. Note: we
     // can't remove "arguments" or "caller" because they are not configurable
@@ -409,7 +409,7 @@ Module.getPyProxyClass = function (flags: number) {
   );
   const super_proto = flags & IS_CALLABLE ? PyProxyFunctionProto : PyProxyProto;
   const sub_proto = Object.create(super_proto, descriptors);
-  function NewPyProxyClass() {}
+  function NewPyProxyClass() { }
   NewPyProxyClass.prototype = sub_proto;
   pyproxyClassMap.set(flags, NewPyProxyClass);
   return NewPyProxyClass;
@@ -820,7 +820,7 @@ const PyProxyFunctionProto = Object.create(
   Function.prototype,
   Object.getOwnPropertyDescriptors(PyProxyProto),
 );
-function PyProxyFunction() {}
+function PyProxyFunction() { }
 PyProxyFunction.prototype = PyProxyFunctionProto;
 
 /**
@@ -834,7 +834,7 @@ export class PyProxyWithLength extends PyProxy {
   }
 }
 
-export interface PyProxyWithLength extends PyLengthMethods {}
+export interface PyProxyWithLength extends PyLengthMethods { }
 
 // Controlled by HAS_LENGTH, appears for any object with __len__ or sq_length
 // or mp_length methods
@@ -870,7 +870,7 @@ export class PyProxyWithGet extends PyProxy {
   }
 }
 
-export interface PyProxyWithGet extends PyGetItemMethods {}
+export interface PyProxyWithGet extends PyGetItemMethods { }
 
 class PyAsJsonAdaptorMethods {
   asJsJson() {
@@ -955,7 +955,7 @@ export class PyProxyWithSet extends PyProxy {
   }
 }
 
-export interface PyProxyWithSet extends PySetItemMethods {}
+export interface PyProxyWithSet extends PySetItemMethods { }
 // Controlled by HAS_SET, appears for any class with __setitem__, __delitem__,
 // mp_ass_subscript,  or sq_ass_item.
 export class PySetItemMethods {
@@ -1011,7 +1011,7 @@ export class PyProxyWithHas extends PyProxy {
   }
 }
 
-export interface PyProxyWithHas extends PyContainsMethods {}
+export interface PyProxyWithHas extends PyContainsMethods { }
 
 // Controlled by HAS_CONTAINS flag, appears for any class with __contains__ or
 // sq_contains
@@ -1090,7 +1090,7 @@ function* iter_helper(
         "This borrowed proxy was automatically destroyed when an iterator was exhausted.",
       ),
     );
-  } catch (e) {}
+  } catch (e) { }
   if (_PyErr_Occurred()) {
     _pythonexc2js();
   }
@@ -1109,7 +1109,7 @@ export class PyIterable extends PyProxy {
   }
 }
 
-export interface PyIterable extends PyIterableMethods {}
+export interface PyIterable extends PyIterableMethods { }
 
 // Controlled by IS_ITERABLE, appears for any object with __iter__ or tp_iter,
 // unless they are iterators. See: https://docs.python.org/3/c-api/iter.html
@@ -1217,7 +1217,7 @@ export class PyAsyncIterable extends PyProxy {
   }
 }
 
-export interface PyAsyncIterable extends PyAsyncIterableMethods {}
+export interface PyAsyncIterable extends PyAsyncIterableMethods { }
 
 export class PyAsyncIterableMethods {
   /**
@@ -1258,7 +1258,7 @@ export class PyIterator extends PyProxy {
   }
 }
 
-export interface PyIterator extends PyIteratorMethods {}
+export interface PyIterator extends PyIteratorMethods { }
 
 // Controlled by IS_ITERATOR, appears for any object with a __next__ or
 // tp_iternext method.
@@ -1311,7 +1311,7 @@ export class PyGenerator extends PyProxy {
   }
 }
 
-export interface PyGenerator extends PyGeneratorMethods {}
+export interface PyGenerator extends PyGeneratorMethods { }
 
 export class PyGeneratorMethods {
   /**
@@ -1387,7 +1387,7 @@ export class PyAsyncIterator extends PyProxy {
   }
 }
 
-export interface PyAsyncIterator extends PyAsyncIteratorMethods {}
+export interface PyAsyncIterator extends PyAsyncIteratorMethods { }
 
 export class PyAsyncIteratorMethods {
   /** @private */
@@ -1451,7 +1451,7 @@ export class PyAsyncGenerator extends PyProxy {
   }
 }
 
-export interface PyAsyncGenerator extends PyAsyncGeneratorMethods {}
+export interface PyAsyncGenerator extends PyAsyncGeneratorMethods { }
 
 export class PyAsyncGeneratorMethods {
   /**
@@ -1554,7 +1554,7 @@ export class PySequence extends PyProxy {
   }
 }
 
-export interface PySequence extends PySequenceMethods {}
+export interface PySequence extends PySequenceMethods { }
 
 // JS default comparison is to convert to strings and compare lexicographically
 function defaultCompareFunc(a: any, b: any): number {
@@ -1861,7 +1861,7 @@ export class PyMutableSequence extends PyProxy {
   }
 }
 
-export interface PyMutableSequence extends PyMutableSequenceMethods {}
+export interface PyMutableSequence extends PyMutableSequenceMethods { }
 
 export class PyMutableSequenceMethods {
   /**
@@ -2434,7 +2434,7 @@ export class PyAwaitable extends PyProxy {
   }
 }
 
-export interface PyAwaitable extends Promise<any> {}
+export interface PyAwaitable extends Promise<any> { }
 
 /**
  * The Promise / JavaScript awaitable API.
@@ -2848,7 +2848,7 @@ export class PyBuffer extends PyProxy {
   }
 }
 
-export interface PyBuffer extends PyBufferMethods {}
+export interface PyBuffer extends PyBufferMethods { }
 
 export class PyBufferMethods {
   /**
@@ -2923,11 +2923,11 @@ export class PyBufferMethods {
       if (bigEndian && alignment > 1) {
         throw new Error(
           "Javascript has no native support for big endian buffers. " +
-            "In this case, you can pass an explicit type argument. " +
-            "For instance, `getBuffer('dataview')` will return a `DataView`" +
-            "which has native support for reading big endian data. " +
-            "Alternatively, toJs will automatically convert the buffer " +
-            "to little endian.",
+          "In this case, you can pass an explicit type argument. " +
+          "For instance, `getBuffer('dataview')` will return a `DataView`" +
+          "which has native support for reading big endian data. " +
+          "Alternatively, toJs will automatically convert the buffer " +
+          "to little endian.",
         );
       }
       let numBytes = largest_ptr - smallest_ptr;
@@ -3002,10 +3002,10 @@ export class PyDict extends PyProxy {
 
 export interface PyDict
   extends PyProxyWithGet,
-    PyProxyWithSet,
-    PyProxyWithHas,
-    PyProxyWithLength,
-    PyIterable {}
+  PyProxyWithSet,
+  PyProxyWithHas,
+  PyProxyWithLength,
+  PyIterable { }
 
 /**
  * A class to allow access to Python data buffers from JavaScript. These are
