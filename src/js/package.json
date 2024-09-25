@@ -4,6 +4,7 @@
     "access": "public"
   },
   "version": "0.26.2",
+  "type": "module",
   "description": "The Pyodide JavaScript package",
   "keywords": [
     "python",
@@ -22,15 +23,18 @@
     ".": {
       "import": "./dist/pyodide.js",
       "types": "./pyodide.ts"
+    },
+    "./version": {
+      "import": "./version.ts",
+      "types": "./version.ts"
     }
   },
   "files": [
+    "package.json",
     "dist",
-    "pyodide.ts",
-    "api.ts",
-    "types.ts",
-    "emscripten-settings.ts",
-    "snapshot.ts"
+    "generated",
+    "vendor",
+    "*.ts"
   ],
   "types": "./pyodide.ts",
   "engines": {

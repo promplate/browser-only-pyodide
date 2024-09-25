@@ -4,8 +4,8 @@ declare var DEBUG: boolean;
 
 import { createLock } from "./lock";
 import { memoize } from "./pyodide-util";
-import { InternalPackageData } from "./load-package";
-import { LoadDynlibFS, ReadFileType } from "./types";
+import type { InternalPackageData } from "./load-package";
+import type { LoadDynlibFS, ReadFileType } from "./types";
 
 // File System-like type which can be passed to
 // Module.loadDynamicLibrary or Module.loadWebAssemblyModule
@@ -153,9 +153,8 @@ export async function loadDynlibsFromPackage(
 ) {
   // assume that shared libraries of a package are located in <package-name>.libs directory,
   // following the convention of auditwheel.
-  const auditWheelLibDir = `${API.sitepackages}/${
-    pkg.file_name.split("-")[0]
-  }.libs`;
+  const auditWheelLibDir = `${API.sitepackages}/${pkg.file_name.split("-")[0]
+    }.libs`;
 
   // This prevents from reading large libraries multiple times.
   const readFileMemoized: ReadFileType = memoize(Module.FS.readFile);

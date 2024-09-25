@@ -1,8 +1,8 @@
 /** @private */
 
-import { ConfigType } from "./pyodide";
+import type { ConfigType } from "./pyodide";
 import { loadBinaryFile, getBinaryResponse } from "./compat";
-import { API, PreRunFunc } from "./types";
+import type { API, PreRunFunc } from "./types";
 
 /**
  * @private

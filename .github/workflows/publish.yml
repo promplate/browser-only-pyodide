@@ -13,7 +13,13 @@ jobs:
 
       - name: Build package
         working-directory: src/js
-        run: bun build pyodide.ts --outdir=dist --sourcemap=linked
+        run: |
+          mkdir -p generated 
+          cp ../core/*.ts ./generated/
+          sed -i 's@../js/@../@g' ./generated/error_handling.ts
+          sed -i 's@from "types"@from "../types"@g' ./generated/pyproxy.ts
+          sed -i 's@from "pyodide-util"@from "../pyodide-util"@g' ./generated/pyproxy.ts
+          bun build pyodide.ts --outdir=dist --sourcemap=linked
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

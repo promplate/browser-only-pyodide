@@ -6,13 +6,13 @@ import {
 } from "./compat.js";
 import { createLock } from "./lock";
 import { loadDynlibsFromPackage } from "./dynload";
-import { PyProxy } from "generated/pyproxy";
+import { PyProxy } from "./generated/pyproxy";
 import {
   canonicalizePackageName,
   uriToPackageData,
   base16ToBase64,
 } from "./packaging-utils";
-import { Lockfile } from "./types";
+import type { Lockfile } from "./types";
 
 /**
  * Initialize the packages index. This is called as early as possible in
