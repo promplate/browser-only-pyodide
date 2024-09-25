@@ -13,10 +13,10 @@
   "homepage": "https://github.com/pyodide/pyodide",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pyodide/pyodide"
+    "url": "https://github.com/promplate/browser-only-pyodide"
   },
   "bugs": {
-    "url": "https://github.com/pyodide/pyodide/issues"
+    "url": "https://github.com/promplate/browser-only-pyodide/issues"
   },
   "license": "Apache-2.0",
   "exports": {
